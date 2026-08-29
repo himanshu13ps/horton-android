@@ -4,7 +4,6 @@ import android.content.Context
 import com.himanshu13ps.horton.data.ExtractedNoteEntity
 import com.himanshu13ps.horton.data.NoteDao
 import com.google.mediapipe.tasks.genai.llminference.LlmInference
-import com.google.mediapipe.tasks.genai.llminference.LlmInferenceSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -23,8 +22,6 @@ class NoteSynthesisEngine(
             val options = LlmInference.LlmInferenceOptions.builder()
                 .setModelPath(llmFile.absolutePath)
                 .setMaxTokens(1024)
-                .setTemperature(0.2f)
-                .setTopK(40)
                 .build()
             
             try {
@@ -59,13 +56,7 @@ class NoteSynthesisEngine(
 
             if (llmInference != null) {
                 try {
-                    val sessionOptions = LlmInferenceSession.LlmInferenceSessionOptions.builder().build()
-                    val session = LlmInferenceSession.createFromOptions(llmInference, sessionOptions)
-                    
-                    generatedMarkdown = session.generateResponse(systemPrompt)
-                    
-                    // Critical: Native Memory Cleanup
-                    session.close()
+                    generatedMarkdown = llmInference!!.generateResponse(systemPrompt)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     generatedMarkdown = "Error during LLM synthesis: ${e.message}"

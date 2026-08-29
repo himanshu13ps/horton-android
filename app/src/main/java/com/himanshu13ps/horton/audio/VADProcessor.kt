@@ -2,8 +2,6 @@ package com.himanshu13ps.horton.audio
 
 import android.content.Context
 import com.k2fsa.sherpa.onnx.Vad
-import com.k2fsa.sherpa.onnx.VadConfig
-import com.k2fsa.sherpa.onnx.SileroVadModelConfig
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import java.io.File
@@ -32,19 +30,7 @@ class VADProcessor(private val context: Context) {
         val vadModelFile = File(modelsDir, "silero_vad.onnx")
 
         if (vadModelFile.exists()) {
-            // Initialize the official Sherpa-ONNX Silero VAD
-            val config = VadConfig(
-                sileroVad = SileroVadModelConfig(
-                    model = vadModelFile.absolutePath,
-                    minSilenceDuration = 0.25f,
-                    minSpeechDuration = 0.25f,
-                    windowSize = 512,
-                    threshold = 0.5f
-                ),
-                sampleRate = 16000,
-                debug = false,
-                numThreads = 1
-            )
+            // Vad Config commented out for now since the model is not properly instantiated
             // vad = Vad(config) // Commented out to prevent crash without actual model file on device
         }
     }
