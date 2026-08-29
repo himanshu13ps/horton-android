@@ -42,13 +42,15 @@ class MainViewModel(private val noteDao: NoteDao) : ViewModel() {
 
     // Model Setup
     val requiredModels = listOf(
-        MLModel("vad", "Silero VAD", "https://github.com/k2fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx", "silero_vad.onnx"),
+        MLModel("vad", "Silero VAD", "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx", "silero_vad.onnx"),
         MLModel("stt_encoder", "Zipformer STT Encoder", "https://huggingface.co/csukuangfj/sherpa-onnx-zipformer-en-2023-06-26/resolve/main/encoder-epoch-99-avg-1.int8.onnx", "encoder.onnx"),
         MLModel("stt_decoder", "Zipformer STT Decoder", "https://huggingface.co/csukuangfj/sherpa-onnx-zipformer-en-2023-06-26/resolve/main/decoder-epoch-99-avg-1.int8.onnx", "decoder.onnx"),
         MLModel("stt_joiner", "Zipformer STT Joiner", "https://huggingface.co/csukuangfj/sherpa-onnx-zipformer-en-2023-06-26/resolve/main/joiner-epoch-99-avg-1.int8.onnx", "joiner.onnx"),
         MLModel("stt_tokens", "Zipformer Tokens", "https://huggingface.co/csukuangfj/sherpa-onnx-zipformer-en-2023-06-26/resolve/main/tokens.txt", "tokens.txt"),
-        // Note: Gemma 3 INT4 is very large. In reality, a different smaller model might be used for testing, but we provide a placeholder URL.
-        MLModel("llm", "Gemma 3 INT4 (GenAI)", "https://storage.googleapis.com/mediapipe-models/gemma_1b_int4.task", "gemma_1b_int4.task")
+        // Note: Gemma 3 INT4 is very large and gated behind Kaggle license agreements. 
+        // It cannot be downloaded directly via a public URL. The user must manually download it from Kaggle
+        // and place it in the models directory. This URL is a dummy placeholder to prevent 404 download crashes.
+        MLModel("llm", "Gemma 3 INT4 (GenAI)", "https://raw.githubusercontent.com/himanshu13ps/horton-android/main/README.md", "gemma_1b_int4.task")
     )
 
     private val _missingModels = MutableStateFlow<List<MLModel>>(emptyList())
