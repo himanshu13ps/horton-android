@@ -7,11 +7,11 @@ plugins {
 
 android {
     namespace = "com.himanshu13ps.horton"
-    compileSdk = 34
+    compileSdk = 36
     defaultConfig {
         applicationId = "com.himanshu13ps.horton"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
     }
