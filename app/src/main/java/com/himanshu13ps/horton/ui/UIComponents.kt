@@ -335,6 +335,8 @@ fun SettingsScreen(viewModel: MainViewModel) {
             }
         }
     }
+}
+
 @Composable
 fun PulseVisualizer() {
     val infiniteTransition = androidx.compose.animation.core.rememberInfiniteTransition(label = "pulse")
