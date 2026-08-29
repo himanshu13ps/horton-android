@@ -102,7 +102,7 @@ dependencies {
   implementation("io.noties.markwon:core:4.6.2")
 
   // Sherpa-ONNX for STT and VAD
-  implementation("com.k2fsa.sherpa.onnx:sherpa-onnx:1.10.37")
+  implementation(files("libs/sherpa-onnx-1.10.37.aar"))
 
   // Accompanist for Permissions
   implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
