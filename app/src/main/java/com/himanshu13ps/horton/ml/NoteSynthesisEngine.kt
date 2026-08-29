@@ -28,7 +28,7 @@ class NoteSynthesisEngine(
                 .build()
             
             try {
-                // llmInference = LlmInference.createFromOptions(context, options)
+                llmInference = LlmInference.createFromOptions(context, options)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -55,24 +55,22 @@ class NoteSynthesisEngine(
                 Transcript: $rawTranscripts
             """.trimIndent()
 
-            // Simulate Inference Session
-            // val sessionOptions = LlmInferenceSession.LlmInferenceSessionOptions.builder().build()
-            // val session = LlmInferenceSession.createFromOptions(llmInference, sessionOptions)
-            
-            // Stub generation
-            // val generatedMarkdown = session.generateResponse(systemPrompt)
-            val generatedMarkdown = """
-                # Executive Summary
-                This is a stubbed generated note from the local LLM.
-                
-                ## Key Decisions
-                - Decided to use Jetpack Compose for the UI.
-                - Chosen Sherpa-ONNX for STT.
-                
-                ## Action Items
-                - [ ] Finalize the database schema
-                - [ ] Implement the UI components
-            """.trimIndent()
+            var generatedMarkdown = "Error: LLM model not loaded or initialized properly."
+
+            if (llmInference != null) {
+                try {
+                    val sessionOptions = LlmInferenceSession.LlmInferenceSessionOptions.builder().build()
+                    val session = LlmInferenceSession.createFromOptions(llmInference, sessionOptions)
+                    
+                    generatedMarkdown = session.generateResponse(systemPrompt)
+                    
+                    // Critical: Native Memory Cleanup
+                    session.close()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    generatedMarkdown = "Error during LLM synthesis: ${e.message}"
+                }
+            }
 
             noteDao.insertExtractedNote(
                 ExtractedNoteEntity(
@@ -83,9 +81,6 @@ class NoteSynthesisEngine(
             )
             
             noteDao.updateConversationStatus(conversationId, conversationData.conversation.duration, "COMPLETED")
-            
-            // Critical: Native Memory Cleanup
-            // session.close()
         }
     }
 

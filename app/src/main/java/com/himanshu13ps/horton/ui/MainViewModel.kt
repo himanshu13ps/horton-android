@@ -107,12 +107,17 @@ class MainViewModel(private val noteDao: NoteDao) : ViewModel() {
         }
     }
 
-    fun endSession() {
+    fun endSession(context: Context) {
         val currentState = _appState.value
         if (currentState is AppState.ActiveRecording) {
             viewModelScope.launch {
                 noteDao.updateConversationStatus(currentState.conversationId, 0, "PENDING_SYNTHESIS")
                 _appState.value = AppState.Review(currentState.conversationId)
+                
+                // Trigger background LLM synthesis
+                val synthesisEngine = com.himanshu13ps.horton.ml.NoteSynthesisEngine(context, noteDao)
+                synthesisEngine.synthesizeNotes(currentState.conversationId)
+                synthesisEngine.release()
             }
         }
     }

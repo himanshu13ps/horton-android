@@ -172,13 +172,14 @@ fun ConversationCard(conv: ConversationEntity, onClick: () -> Unit) {
 @Composable
 fun ActiveRecordingScreen(viewModel: MainViewModel, conversationId: Long, onStopRecording: () -> Unit) {
     val details by viewModel.currentConversationDetails.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     Scaffold(
         containerColor = Color.Transparent,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { 
-                    viewModel.endSession()
+                    viewModel.endSession(context)
                     onStopRecording()
                 },
                 containerColor = MaterialTheme.colorScheme.error

@@ -61,22 +61,60 @@ class TranscriptionEngine(
             )
         )
 
-        // Read audio from file - this requires parsing the WAV file or using Sherpa's WaveReader
-        // We will simulate the transcription since we don't have the real model loaded
-        val text = "Transcribed text for segment $sequenceIndex" // recognizer?.decode(filePath) or similar
-        val timestampOffset = 0L // Extract from result if supported
+        var text = ""
+        var timestampOffset = 0L
 
-        noteDao.insertTranscript(
-            TranscriptEntity(
-                conversationId = conversationId,
-                segmentId = segmentId,
-                rawText = text,
-                timestampOffset = timestampOffset
+        val file = File(filePath)
+        if (file.exists() && recognizer != null) {
+            try {
+                // Read 16-bit PCM WAV and convert to FloatArray [-1.0, 1.0]
+                val bytes = file.readBytes()
+                // Skip 44-byte WAV header
+                if (bytes.size > 44) {
+                    val pcmData = ByteArray(bytes.size - 44)
+                    System.arraycopy(bytes, 44, pcmData, 0, pcmData.size)
+                    
+                    val floatArray = FloatArray(pcmData.size / 2)
+                    for (i in floatArray.indices) {
+                        val low = pcmData[i * 2].toInt() and 0xFF
+                        val high = pcmData[i * 2 + 1].toInt() shl 8
+                        val sample = (high or low).toShort()
+                        floatArray[i] = sample / 32768.0f
+                    }
+
+                    // Run STT Inference
+                    val stream = recognizer!!.createStream()
+                    stream.acceptWaveform(floatArray, 16000)
+                    recognizer!!.decode(stream)
+                    val result = recognizer!!.getResult(stream)
+                    
+                    text = result.text ?: ""
+                    // Extract start time if available
+                    timestampOffset = if (result.timestamps != null && result.timestamps.isNotEmpty()) {
+                        (result.timestamps.first() * 1000).toLong()
+                    } else {
+                        0L
+                    }
+                    
+                    stream.release()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        if (text.isNotBlank()) {
+            noteDao.insertTranscript(
+                TranscriptEntity(
+                    conversationId = conversationId,
+                    segmentId = segmentId,
+                    rawText = text,
+                    timestampOffset = timestampOffset
+                )
             )
-        )
+        }
 
         // Cleanup: delete the processed wav file to save storage
-        val file = File(filePath)
         if (file.exists()) {
             file.delete()
         }
@@ -84,7 +122,7 @@ class TranscriptionEngine(
     }
 
     fun release() {
-        // recognizer?.release()
+        recognizer?.release()
         recognizer = null
     }
 }

@@ -85,6 +85,7 @@ class RecordingService : Service() {
     private fun stopRecordingSession() {
         audioCaptureManager.stopCapture()
         vadProcessor.finishSession()
+        transcriptionEngine.release()
         
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
