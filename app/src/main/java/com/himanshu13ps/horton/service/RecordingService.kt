@@ -52,10 +52,19 @@ class RecordingService : Service() {
 
     private fun startRecordingSession() {
         createNotificationChannel()
+        
+        val stopIntent = Intent(this, RecordingService::class.java).apply {
+            action = ACTION_STOP
+        }
+        val stopPendingIntent = android.app.PendingIntent.getService(
+            this, 0, stopIntent, android.app.PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("AI Note-Taker")
             .setContentText("Actively listening and transcribing...")
             .setSmallIcon(android.R.drawable.ic_btn_speak_now) // placeholder icon
+            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Stop Recording", stopPendingIntent)
             .setOngoing(true)
             .build()
 

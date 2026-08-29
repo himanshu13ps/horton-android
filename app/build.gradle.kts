@@ -57,6 +57,9 @@ dependencies {
   // Arch Components
   implementation(libs.androidx.lifecycle.runtime.compose)
   implementation(libs.androidx.lifecycle.viewmodel.compose)
+  
+  // UI Polish
+  implementation("com.github.jeziellago:compose-markdown:0.5.0")
 
   // Compose
   implementation(libs.androidx.compose.ui)

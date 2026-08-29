@@ -191,12 +191,12 @@ fun ActiveRecordingScreen(viewModel: MainViewModel, conversationId: Long, onStop
         Column(modifier = Modifier.padding(padding).fillMaxSize().padding(16.dp)) {
             Text("Recording Active", style = MaterialTheme.typography.headlineMedium, color = Color.White)
             Spacer(Modifier.height(16.dp))
-            // Placeholder Visualizer
+            // Pulse Visualizer
             Box(
-                modifier = Modifier.fillMaxWidth().height(100.dp).background(Color.White.copy(alpha=0.1f), RoundedCornerShape(16.dp)),
+                modifier = Modifier.fillMaxWidth().height(150.dp).background(Color.White.copy(alpha=0.05f), RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                Text("[ Audio Visualizer ]", color = Color.White)
+                PulseVisualizer()
             }
             Spacer(Modifier.height(16.dp))
             
@@ -247,7 +247,10 @@ fun ReviewScreen(viewModel: MainViewModel, conversationId: Long) {
                     // Notes View
                     Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
                         if (details?.notes != null) {
-                            Text(details?.notes!!.markdownContent, color = Color.White)
+                            dev.jeziellago.compose.markdowntext.MarkdownText(
+                                markdown = details?.notes!!.markdownContent,
+                                color = Color.White
+                            )
                         } else {
                             Text("Generating notes (Simulated Inference...)", color = Color.LightGray)
                         }
@@ -331,4 +334,40 @@ fun SettingsScreen(viewModel: MainViewModel) {
             }
         }
     }
+@Composable
+fun PulseVisualizer() {
+    val infiniteTransition = androidx.compose.animation.core.rememberInfiniteTransition(label = "pulse")
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = 1.5f,
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            animation = androidx.compose.animation.core.tween(1000, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+            repeatMode = androidx.compose.animation.core.RepeatMode.Reverse
+        ),
+        label = "scale"
+    )
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 0.8f,
+        targetValue = 0f,
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            animation = androidx.compose.animation.core.tween(1000, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+            repeatMode = androidx.compose.animation.core.RepeatMode.Reverse
+        ),
+        label = "alpha"
+    )
+
+    Box(contentAlignment = Alignment.Center) {
+        androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
+            drawCircle(
+                color = Color(0xFF6C63FF),
+                radius = 100f * scale,
+                alpha = alpha
+            )
+            drawCircle(
+                color = Color(0xFF6C63FF),
+                radius = 50f
+            )
+        }
+    }
 }
+
